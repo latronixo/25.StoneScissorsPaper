@@ -18,7 +18,7 @@ struct ContentView: View {
     @State private var appMove = ""         //жест, который рандомно "выбросит" приложение
     @State private var score = 0            //очки
     @State private var shouldWin = false    //флаг, определяющий задание: пользователю нужно выйграть или проиграть?
-    @State private var round = 1            //номер раунда
+    @State private var round = 0            //номер раунда
     @State private var showAlert = false    //флаг отображения алерта
     
     //Text, пишуший задание: пользователю нужно выйграть или проиграть?
@@ -41,6 +41,7 @@ struct ContentView: View {
             VStack {
                 Text("Ваш счет: \(score)")
                     .font(.largeTitle.bold())
+                Text("Раунд № \(round)")
                 Text("Ход приложения:")
                 Text(appMove)
                     .font(.system(size: 100))
@@ -62,25 +63,21 @@ struct ContentView: View {
                         Text(move)
                             .font(.system(size: 100))
                     }
-                    .alert("Игра окончена! Ваш счет: \(String(score))", isPresented: $showAlert){
+                    .alert("Игра окончена! Ваш счет: \(String(score))", isPresented: $showAlert) {
                         Button("OK") {
-                            if round == 10 {
-                                round = 0
-                                score = 0
-                            }
+                            //если это последний раунд, то возвращаемся к 1 раунду и обнуляем счет
+                            round = 1
+                            score = 0
                         }
                     }
-
                 }
             }
             Spacer()
         }
         .padding(10)
-        .onAppear{
+        .onAppear {
             nextRound()
-            shouldWin = Bool.random()
         }
-
     }
     
     //событие выбора пользователя
@@ -101,18 +98,12 @@ struct ContentView: View {
 
         if round == 10 {
             showAlert = true    //показываем алерт с текущим счетом
-//            round = 0
-//            score = 0
         } else {
             nextRound()
         }
-
-        //
-        //print ("индекс выбранного пользователем жеста \(indexUserMove)")
     }
     
     private func nextRound() {
-        
         round += 1
         appMove = moves[Int.random(in: 0...2)]
         shouldWin.toggle()
